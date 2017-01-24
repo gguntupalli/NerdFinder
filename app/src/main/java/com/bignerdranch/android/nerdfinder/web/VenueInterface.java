@@ -8,6 +8,7 @@ import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.Query;
+import rx.Observable;
 
 /**
  * Created by gguntupalli on 23/01/17.
@@ -19,5 +20,5 @@ public interface VenueInterface {
 
     @FormUrlEncoded
     @POST("checkins/add")
-    Call<Object> venueCheckin(@Field("venueId") String venueId);
+    Observable<Object> venueCheckin(@Field("venueId") String venueId);
 }
