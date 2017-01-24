@@ -31,9 +31,18 @@ android {
     }
 }
 
+configurations {
+    all*.exclude group: 'commons-logging', module: 'commons-logging'
+}
+
 dependencies {
     testCompile 'junit:junit:4.12'
     testCompile files('libs/wiremock-1.55-standalone.jar')
+    testCompile 'org.robolectric:robolectric:3.1.2'
+    testCompile 'org.khronos:opengl-api:gl1.1-android-2.1_r1'
+    testCompile 'org.mockito:mockito-core:2.1.0'
+    testCompile 'org.slf4j:slf4j-nop:1.7.12'
+
     compile 'com.android.support:appcompat-v7:24.2.1'
     compile 'com.android.support:recyclerview-v7:24.2.1'
     compile 'com.google.code.gson:gson:2.7'

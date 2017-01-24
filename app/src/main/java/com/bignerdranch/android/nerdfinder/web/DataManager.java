@@ -29,6 +29,7 @@ import retrofit2.Callback;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
+import rx.Scheduler;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
@@ -60,6 +61,8 @@ public class DataManager {
     private List<Venue> mVenueList;
     private List<VenueSearchListener> mSearchListenerList;
     private List<VenueCheckInListener> mCheckInListenerList;
+    private Scheduler mSubscribeOnScheduler;
+    private Scheduler mObserveOnScheduler;
 
     public static DataManager get(Context context) {
         if (sDataManager == null) {
@@ -108,7 +111,17 @@ public class DataManager {
         mAuthenticatedRetrofit = authenticatedRetrofit;
         mSearchListenerList = new ArrayList<>();
         mCheckInListenerList = new ArrayList<>();
+        mSubscribeOnScheduler = getSubscribeOnScheduler();
+        mObserveOnScheduler = getObserveOnScheduler();
 
+    }
+
+    Scheduler getObserveOnScheduler() {
+        return AndroidSchedulers.mainThread();
+    }
+
+    Scheduler getSubscribeOnScheduler() {
+        return Schedulers.io();
     }
 
     private static Interceptor sRequestInterceptor = new Interceptor() {
@@ -128,7 +141,7 @@ public class DataManager {
         }
     };
 
-    private static Interceptor sAuthenticatedRequestinterceptor = new Interceptor() {
+    public static Interceptor sAuthenticatedRequestinterceptor = new Interceptor() {
         @Override
         public Response intercept(Chain chain) throws IOException {
             HttpUrl url = chain.request().url().newBuilder()
@@ -179,8 +192,8 @@ public class DataManager {
         VenueInterface venueInterface = mAuthenticatedRetrofit.create(VenueInterface.class);
 
         venueInterface.venueCheckin(venueId)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(getSubscribeOnScheduler())
+                .observeOn(getObserveOnScheduler())
                 .subscribe(
                         result -> notifyCheckInListeners(),
                         error -> handleCheckInException(error)
